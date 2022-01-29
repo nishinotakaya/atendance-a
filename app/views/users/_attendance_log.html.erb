@@ -9,7 +9,7 @@
         </button>
       <h1 class="modal-title" , style="text-align:center">勤怠修正ログ</h1>
       <div class="modal-body">
-        <%= form_with(url: attendance_log_user_path(@user), remote: true, method: :get ) do |f| %>
+        <%= form_with(url: attendance_log_user_path(@user), method: :get ) do |f| %>
           <table class="apporoved-log-table-header table-bordered table-striped table-condensed">
     　　　   　<form method="post" action="example.cgi">
               <tbody>

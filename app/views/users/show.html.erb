@@ -32,7 +32,7 @@
     <%= "#{@user_one_month_attendance_count}件のお知らせ"  %>
     </a>
   <% else %>
-    [所属長承認のお知らせ]
+      [所属長承認のお知らせ]
   <% end %>  
 </div>
 <div>
@@ -119,6 +119,7 @@
           </td>
           </td>
           <td><%= day.finished_at.strftime('%-H') if day.finished_at.present? %></td>
+
           <td><%= day.finished_at.floor_to(15.minutes).strftime('%M') if day.finished_at.present? %></td>
           <td>
             <% if attendance_state(day) && day.started_at.present? &&  day.finished_at.blank? %>

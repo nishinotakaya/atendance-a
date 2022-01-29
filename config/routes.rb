@@ -21,7 +21,7 @@
         get 'attendance_log' #勤怠ログ
        
       end
-        
+         
       resources :attendances, only: :update do #
         member do #idが付く！memberは特定のデータにアクションを利用する
           get 'edit_overwork_request'

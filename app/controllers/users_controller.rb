@@ -14,13 +14,11 @@ class UsersController < ApplicationController
     end
   end
    
- 
-    
   
   def import
     if params[:file].blank?
       flash[:warning] = "CSVファイルが選択されていません。"
-    else  
+    else
     # fileはtmpに自動で一時保存される
       User.import(params[:file])
       flash[:success] = "ユーザー情報をインポートしました。"  
@@ -28,7 +26,6 @@ class UsersController < ApplicationController
     end
   end
   
- 
  
   def show
     @worked_sum = @attendances.where.not(started_at: nil).count
@@ -48,9 +45,6 @@ class UsersController < ApplicationController
     end
   end
   
-    
-  
-
   def new
     @user = User.new
   end
@@ -120,8 +114,6 @@ class UsersController < ApplicationController
 
 private
 
-    
-
     def basic_info_params
       params.require(:user).permit(:name, :email, :department, :affiliation, :password, :password_confirmation, :employee_number, :uid, :designated_work_start_time, :designated_work_end_time)
     end
@@ -151,7 +143,7 @@ private
 
     # システム管理権限所有かどうか判定します。
     def admin_user
-      redirect_to (root_url) unless current_user.admin?
+      redirect_to(root_url) unless current_user.admin?
     end
     
     def admin_or_correct_user

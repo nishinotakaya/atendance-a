@@ -1,18 +1,17 @@
 <div class="modal-dialog modal-lg modal-dialog-center">
   <div class="modal-content">
     <div class="modal-header", style="border:none">
-        <%= form_with(model: @user, url: update_superior_announcement_user_attendances_path(@user), method: :patch, local: true) do |f| %>
+      <%= form_with(model: @user, url: update_superior_announcement_user_attendances_path(@user), method: :patch, local: true) do |f| %>
       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">&times;
         </span>
         </button>
       <!--tableの外にform_withがある場合はtableの外にsubmitを書く-->  
-          <% @attendances.each do |id, attendance| %>    
-      <h1 class="modal-title" , style="text-align:center">[<%= User.find(id).name %>からの残業申請]</h1>
+            <% @attendances.each do |id, attendance| %>    
+        <h1 class="modal-title" , style="text-align:center">[<%= User.find(id).name %>からの残業申請]</h1>
         <div class="modal-body">
           <div class= "row">
-              
-            <table class="apporoved-log-table-header table-bordered table-striped table-condensed">
+            <table class="apporoved-log-table-headuserer table-bordered table-striped table-condensed">
               <thead>
                 <tr>
                   <th>日付</th>
@@ -27,7 +26,7 @@
                 </tr>
               </thead>
               
-              <!--ifのログインしてるuserと上長のカラム名が一緒であること、かつ申請中だったら表示する。かつattendance.idとuser.idが一緒であること！-->
+              <!--attendance-->
                 <% attendance.each do |day| %>
                   <%= f.fields_for "attendances[]", day do |a| %> 
                   <tbody>
@@ -54,12 +53,12 @@
                   </tbody>
                   <% end %>
                 <% end %>
-              </table>
+            </table>
             <% end %>
-          <%= f.submit "変更を送信する", class: "btn btn-primary" %>
-          <% end %>
-        </div>
-      </div>  
+          </div>
+        </div>  
+        <%= f.submit "変更を送信する", class: "btn btn-primary" %>
+      <% end %>
     </div>
   </div>
 </div>  

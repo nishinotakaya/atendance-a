@@ -20,6 +20,9 @@ gem 'roo'
 group :development, :test do
   gem 'sqlite3', '1.3.13'
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'pry-rails'
+  gem 'hirb'
+  gem 'hirb-unicode'
 end
 
 group :development do

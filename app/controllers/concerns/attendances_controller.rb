@@ -38,8 +38,8 @@ class AttendancesController < ApplicationController
       edit_one_month_params.each do |id, item|
         if item[:instructor_confirmation].present? 
           if item[:edit_started_at].blank? || item[:edit_finished_at].blank?
-              flash[:danger] = "時間を入力してください"
-              redirect_to attendances_edit_one_month_user_url(date: params[:date]) and return #上長が入ってなく、時間が入ってなかったら更新されません。and returnは繰り返しredirectが使われていること！
+            flash[:danger] = "時間を入力してください"
+            redirect_to attendances_edit_one_month_user_url(date: params[:date]) and return #上長が入ってなく、時間が入ってなかったら更新されません。and returnは繰り返しredirectが使われていること！
           end
           if item[:edit_started_at].present? && item[:edit_finished_at].present?
             if item[:edit_started_at] > item[:edit_finished_at]
@@ -51,9 +51,18 @@ class AttendancesController < ApplicationController
           attendance = Attendance.find(id)
           attendance.attributes = item
           attendance.save!(context: :attendance_update)
+          if item[:edit_finished_at].present?
+             item[:edit_finished_at] = nil
+          end
+          if item[:instructor_confirmation].present?
+             item[:instructor_confirmation] = nil
+          end
+          if item[:note].present?
+             item[:note] = nil
+          end
         end
       end
-   end
+    end
     flash[:success] = "1ヶ月分の勤怠情報を更新しました。"
     redirect_to user_url(date: params[:date])
   rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐です。
@@ -65,13 +74,17 @@ class AttendancesController < ApplicationController
   def edit_overwork_request
     @user = User.find(params[:user_id])
     @attendance = Attendance.find(params[:id])
-    @superior = User.where(superior: true).where.not(id: @user.id) #最初のwhereは自分、where.notを付け加えることによって自分以外の上長! 
+    @superior = User.where(superior: true).where.not(id: @user.id) #最初のwhereは上長A、上長B、where.notを付け加えることによって自分以外の上長! 
   end
   
   def update_overwork_request
     @user = User.find(params[:user_id])
     @attendance = Attendance.find(params[:id]) #attendanceを更新！
     params[:attendance][:overtime_status] = "申請中" #[:attendance]の[overtime_status]が申請中だった場合
+    if params[:attendance][:plan_finished_at].blank?
+      flash[:danger] = "終了予定時間を入力してください"
+      redirect_to user_url(@user)and return
+    end
     if @attendance.update_attributes(overwork_params) #←ストロングパラメータの名前
       flash[:success] = "残業申請を更新しました"
       redirect_to user_url(@user)and return #処理で飛ばす先.com/rails/info/routesとホームページの方に書くとroute見れる
@@ -80,7 +93,7 @@ class AttendancesController < ApplicationController
       redirect_to user_url(@user)and return #←user_urlの中に(@user)を入れることにより@userがuser_urlに飛ばされる！
     end
   end
-  
+
   # 残業申請承認(お知らせ)モーダル！
   def edit_superior_announcement 
     @user = User.find(params[:user_id])
@@ -163,19 +176,11 @@ class AttendancesController < ApplicationController
                attendance.before_finished_at = attendance.finished_at #勤怠ログの終了時間になにも入っていなかったら,承認されたら、勤怠ログに入る設定！
             end  
             attendance.started_at = attendance.edit_started_at
-            attendance.finished_at = attendance.edit_finished_at #編集したものが承認されshow.htmlの表に定義される設定
+            attendance.finished_at = attendance.edit_finished_at #編集��たものが承認されshow.htmlの表に定義される設定
             if attendance.edit_started_at.present?
               attendance.edit_started_at = nil
             end  
-            if attendance.edit_finished_at.present?
-              attendance.edit_finished_at = nil
-            end
-            if attendance.instructor_confirmation.present?
-              attendance.instructor_confirmation = nil
-            end
-            if attendance.note.present?
-              attendance.note = nil
-            end  
+              
           elsif item[:change_status] == "否認"   
             m3 = m3 + 1
           elsif item[:change_status] == "なし"   
@@ -197,11 +202,6 @@ class AttendancesController < ApplicationController
     flash[:danger] = "無効な入力データがあった為、更新をキャンセルしました。"
     redirect_to user_url(@user) and return
   end
-          
-        
-    
-    
-      
   
   def new_show_change #確認ボタン
     @user = User.find(params[:user_id])
@@ -219,9 +219,9 @@ class AttendancesController < ApplicationController
       #@userのattendanceのレコードを探すその中からfind_byの条件にあうもの@first_day(選択した月初日)を選ぶ項目
       attendance.user_one_month_attendance_status = "申請中" 
       #特定したレコードに対して申請中とuser_one_month_attendance_statusに入れてあげる
-      attendance.update(user_attendance_show_params) #:attendance.updateで更新
+      attendance.update(user_attendance_show_params) #:attendance.updateで��新
       flash[:success] = "1ヶ月分の勤怠情報を申請しました。"
-    end  
+    end
     redirect_to user_url(@user)
   end
   
@@ -232,6 +232,7 @@ class AttendancesController < ApplicationController
   end
   
   def update_superior_approval
+     binding.pry
     ActiveRecord::Base.transaction do
       @user = User.find(params[:user_id])
         x1 = 0
@@ -264,11 +265,6 @@ class AttendancesController < ApplicationController
     flash[:danger] = "無効な入力データがあった為、更新をキャンセルしました。"
     redirect_to user_url(@user) and return
   end
-  
-  
-  
-  
-  
     
   
    private
